@@ -1,0 +1,20 @@
+# Group - 3
+Once you clone the repo on your machine
+### On your terminal and run: flutter pub get
+
+## FIGMA WORK
+
+[https://www.figma.com/design/XFtVPAmekBukNMbK1vIusL/Kenyi_Paul_202312453?node-id=0-1&t=skcAN1jq03Q14q50-0](https://www.figma.com/design/XFtVPAmekBuKnAbK1vIusL/Kenyi_Paul_202312453?node-id=0-1&t=skcANlJqO3Q14qS0-1)
+
+## MEMBERS
+
+1. 202311993 DANIEL JOHN
+2. 202312453 KENYI PAUL
+3. 202310655 MONICA DAVID
+4. 202310862 INEZ RURANGWA
+5. 202312124 CHIEKJOWK KOBFER
+6. 202312461 CHOLONG JUNIOR
+7. 202310418 EMMANUEL FRANCIS
+8. 202312130 NOEL KWAJE
+9. 202311328 MOSES KOSE
+10. 202311665 ABDALLAH MOHAMED
