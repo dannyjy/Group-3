@@ -1,14 +1,13 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:group_3/models/product.dart';
+import 'package:group_3/models/product_model.dart';
 
 class ProductCard extends StatelessWidget {
-  final Product product;
+  final Product products;
   final VoidCallback onTap;
 
   const ProductCard({
     super.key,
-    required this.product,
+    required this.products,
     required this.onTap,
   });
 
@@ -35,7 +34,7 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      product.name,
+                      products.name,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -45,7 +44,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Category: ${product.category}',
+                      'Category: ${products.category}',
                       style: TextStyle(
                         fontSize: 14,
                         color: Colors.grey[600],
@@ -53,7 +52,7 @@ class ProductCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Quantity: ${product.quantity}',
+                      'Quantity: ${products.quantity}',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.grey[700],

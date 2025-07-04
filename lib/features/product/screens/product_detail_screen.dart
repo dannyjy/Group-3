@@ -3,7 +3,7 @@ import 'package:group_3/common/widgets/custom_app_bar.dart';
 import 'package:group_3/common/widgets/custom_button.dart';
 import 'package:group_3/features/auth/widgets/auth_text_field.dart';
 import 'package:group_3/features/product/services/product_service.dart';
-import 'package:group_3/models/product.dart';
+import 'package:group_3/models/product_model.dart';
 import 'package:provider/provider.dart';
 import 'package:group_3/common/utils/constants.dart';
 
@@ -60,10 +60,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     });
 
     final productService = Provider.of<ProductService>(context, listen: false);
-    String result = await productService.updateProduct(
+    String result = await productService.editProduct(
       productId: widget.product!.id,
       name: _productNameController.text,
-      quantity: int.tryParse(_quantityController.text) ?? 0,
+      quantity: _quantityController.text,
       category: _selectedCategory!,
     );
 
@@ -115,7 +115,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       final productService =
           Provider.of<ProductService>(context, listen: false);
       String result = await productService.deleteProduct(
-        productId: widget.product!.id,
+        widget.product!.id,
       );
 
       setState(() {

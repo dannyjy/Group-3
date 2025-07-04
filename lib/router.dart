@@ -4,7 +4,7 @@ import 'package:group_3/features/auth/screens/signup_screen.dart';
 import 'package:group_3/features/product/screens/add_product_screen.dart';
 import 'package:group_3/features/product/screens/product_list_screen.dart';
 import 'package:group_3/features/product/screens/product_detail_screen.dart';
-import 'package:group_3/models/product.dart';
+import 'package:group_3/models/product_model.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {

@@ -52,7 +52,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     final productService = Provider.of<ProductService>(context, listen: false);
     String result = await productService.addProduct(
       name: _productNameController.text,
-      quantity: int.tryParse(_quantityController.text) ?? 0,
+      quantity: _quantityController.text,
       category: _selectedCategory!,
     );
 

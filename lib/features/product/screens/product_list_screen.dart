@@ -3,7 +3,7 @@ import 'package:group_3/common/widgets/custom_app_bar.dart';
 import 'package:group_3/features/product/screens/add_product_screen.dart';
 import 'package:group_3/features/product/screens/product_detail_screen.dart';
 import 'package:group_3/features/product/services/product_service.dart';
-import 'package:group_3/models/product.dart';
+import 'package:group_3/models/product_model.dart';
 import 'package:group_3/features/product/widgets/product_card.dart';
 import 'package:provider/provider.dart';
 import 'package:group_3/common/utils/constants.dart';
@@ -35,7 +35,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(56.0),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: DropdownButtonFormField<String>(
               value: _selectedFilterCategory,
               decoration: InputDecoration(
@@ -48,7 +49,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
               ),
-              items: ['All', ...AppConstants.productCategories].map((String category) {
+              items: ['All', ...AppConstants.productCategories]
+                  .map((String category) {
                 return DropdownMenuItem<String>(
                   value: category,
                   child: Text(category),
@@ -65,31 +67,45 @@ class _ProductListScreenState extends State<ProductListScreen> {
       ),
       body: Consumer<ProductService>(
         builder: (context, productService, child) {
-          List<Product> products = productService.products;
+          return StreamBuilder<List<Product>>(
+            stream: productService.getProducts() ,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              }
+              List<Product> products = snapshot.data ?? [];
 
-          // Apply category filter
-          if (_selectedFilterCategory != 'All' && _selectedFilterCategory != null) {
-            products = products
-                .where((product) => product.category == _selectedFilterCategory)
-                .toList();
-          }
+              // Apply category filter
+              if (_selectedFilterCategory != 'All' &&
+                  _selectedFilterCategory != null) {
+                products = products
+                    .where((product) =>
+                        product.category == _selectedFilterCategory)
+                    .toList();
+              }
 
-          if (products.isEmpty) {
-            return const Center(child: Text('No products added yet or matching filter.'));
-          }
+              if (products.isEmpty) {
+                return const Center(
+                    child: Text('No products added yet or matching filter.'));
+              }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return ProductCard(
-                product: product,
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    ProductDetailScreen.routeName,
-                    arguments: product,
+              return ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return ProductCard(
+                    products: product,
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        ProductDetailScreen.routeName,
+                        arguments: product,
+                      );
+                    },
                   );
                 },
               );

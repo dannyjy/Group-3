@@ -1,56 +1,68 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class AuthService extends ChangeNotifier {
-  bool _isLoggedIn = false;
-  String? _currentUserId; // Dummy user ID
+class AuthService {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  bool get isLoggedIn => _isLoggedIn;
-  String? get currentUserId => _currentUserId;
-
-  // Dummy user data for demonstration
-  final Map<String, String> _users = {
-    'test@example.com': 'password123',
-    'user@example.com': '123456',
-  };
+  // Getter for the current user
+  User? get currentUser => _auth.currentUser;
 
   Future<String> signUpUser({
     required String fullName,
     required String email,
     required String password,
   }) async {
-    if (email.isEmpty || password.isEmpty || fullName.isEmpty) {
-      return 'Please enter all the fields';
+    String res = "Some error occurred";
+    try {
+      if (email.isNotEmpty && password.isNotEmpty && fullName.isNotEmpty) {
+        // Register user with email and password
+        UserCredential cred = await _auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        // Store additional user data in Firestore
+        await _firestore.collection('users').doc(cred.user!.uid).set({
+          'fullName': fullName,
+          'email': email,
+          'password': password,
+          'uid': cred.user!.uid,
+        });
+
+        res = "success";
+      } else {
+        res = "Please enter all the fields";
+      }
+    } on FirebaseAuthException catch (e) {
+      res = e.message ?? 'An unknown error occurred.';
+    } catch (err) {
+      res = err.toString();
     }
-    if (_users.containsKey(email)) {
-      return 'Email already registered.';
-    }
-    _users[email] = password;
-    _isLoggedIn = true;
-    _currentUserId = email; // Using email as a dummy user ID
-    notifyListeners();
-    return 'success';
+    return res;
   }
 
   Future<String> signInUser({
     required String email,
     required String password,
   }) async {
-    if (email.isEmpty || password.isEmpty) {
-      return 'Please enter all the fields';
+    String res = "Some error occurred";
+    try {
+      if (email.isNotEmpty && password.isNotEmpty) {
+        await _auth.signInWithEmailAndPassword(email: email, password: password);
+        res = "success";
+      } else {
+        res = "Please enter all the fields";
+      }
+    } on FirebaseAuthException catch (e) {
+      res = e.message ?? 'An unknown error occurred.';
+    } catch (err) {
+      res = err.toString();
     }
-    if (_users.containsKey(email) && _users[email] == password) {
-      _isLoggedIn = true;
-      _currentUserId = email; // Using email as a dummy user ID
-      notifyListeners();
-      return 'success';
-    } else {
-      return 'Invalid email or password.';
-    }
+    return res;
   }
 
-  void signOut() {
-    _isLoggedIn = false;
-    _currentUserId = null;
-    notifyListeners();
+  Future<void> signOut() async {
+    await _auth.signOut();
   }
 }

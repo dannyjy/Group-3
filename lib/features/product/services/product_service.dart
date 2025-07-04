@@ -1,68 +1,93 @@
-import 'package:flutter/material.dart';
-import 'package:group_3/models/product.dart';
-// For accessing AuthService
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:group_3/models/product_model.dart';
+import 'package:uuid/uuid.dart';
 
-class ProductService extends ChangeNotifier {
-  final List<Product> _products = []; // In-memory storage for products
-
-  List<Product> get products => List.unmodifiable(_products); // Immutable list
+class ProductService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Add a new product
   Future<String> addProduct({
     required String name,
-    required int quantity,
+    required String quantity,
     required String category,
   }) async {
+    String res = "Some error occurred";
     try {
-      final Product product = Product(
+      if (name.isEmpty || quantity.isEmpty) {
+        return "Please fill all fields";
+      }
+      String productId = const Uuid().v1();
+
+      Product product = Product(
+        id: productId,
         name: name,
-        quantity: quantity,
+        quantity: int.parse(quantity),
         category: category,
       );
 
-      _products.add(product);
-      notifyListeners(); // Notify listeners that the product list has changed
-      return 'success';
-    } catch (e) {
-      return e.toString();
+      await _firestore
+          .collection('products')
+          .doc(productId)
+          .set(product.toJson());
+      res = "success";
+    } catch (err) {
+      res = err.toString();
     }
+    return res;
   }
 
-  // Update an existing product
-  Future<String> updateProduct({
+  // Edit an existing product
+  Future<String> editProduct({
     required String productId,
     required String name,
-    required int quantity,
+    required String quantity,
     required String category,
   }) async {
+    String res = "Some error occurred";
     try {
-      final int index = _products.indexWhere((p) => p.id == productId);
-      if (index == -1) {
-        return 'Product not found.';
-      }
+      Map<String, dynamic> updateData = {
+        'name': name,
+        'quantity': int.tryParse(quantity) ?? 0,
+        'category': category,
+      };
 
-      _products[index] = _products[index].copyWith(
-        name: name,
-        quantity: quantity,
-        category: category,
-      );
-      notifyListeners();
-      return 'success';
-    } catch (e) {
-      return e.toString();
+      await _firestore.collection('products').doc(productId).update(updateData);
+      res = "success";
+    } catch (err) {
+      res = err.toString();
     }
+    return res;
   }
 
   // Delete a product
-  Future<String> deleteProduct({
-    required String productId,
-  }) async {
+  Future<String> deleteProduct(String productId) async {
+    String res = "Some error occurred";
     try {
-      _products.removeWhere((p) => p.id == productId);
-      notifyListeners();
-      return 'success';
-    } catch (e) {
-      return e.toString();
+      // Note: You should also delete the product image from Firebase Storage
+      await _firestore.collection('products').doc(productId).delete();
+      res = "success";
+    } catch (err) {
+      res = err.toString();
     }
+    return res;
+  }
+  // Fetch all products
+  Future<List<Product>> products() async {
+    List<Product> products = [];
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('products').get();
+      for (var doc in snapshot.docs) {
+        products.add(Product.fromSnap(doc));
+      }
+    } catch (err) {
+      print("Error fetching products: $err");
+    }
+    return products;
+  }
+
+  Stream<List<Product>> getProducts() {
+    return _firestore.collection('products').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => Product.fromSnap(doc)).toList();
+    });
   }
 }

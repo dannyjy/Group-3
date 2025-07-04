@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:group_3/features/auth/screens/login_screen.dart';
 import 'package:group_3/features/auth/services/auth_service.dart';
 import 'package:group_3/features/auth/widgets/auth_text_field.dart';
-import 'package:group_3/features/product/screens/product_list_screen.dart';
 import 'package:group_3/common/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
@@ -60,7 +60,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if (result == 'success') {
       Navigator.of(context).pushNamedAndRemoveUntil(
-        ProductListScreen.routeName,
+        LoginScreen.routeName,
         (Route<dynamic> route) => false,
       );
     } else {
